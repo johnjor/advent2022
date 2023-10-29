@@ -15,7 +15,8 @@ func max(x, y int) int {
 }
 
 func main() {
-	file, err := os.Open("input.txt")
+	filename := os.Args[1]
+	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)
 	}
