@@ -23,6 +23,7 @@ func main() {
 
 	i := 1
 	max_i := 1
+	_ = max_i
 	scanner := bufio.NewScanner(file)
 	total := 0
 	max_total := 0
@@ -51,8 +52,9 @@ func main() {
 	}
 
 	// Get last row?
-	fmt.Printf("%d: %d\n", max_i, max_total)
-
+	//fmt.Printf("%d: %d\n", max_i, max_total)
+	// Question specifically asks for just the Calories as output
+	fmt.Printf("%d\n", max_total)
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
