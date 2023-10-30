@@ -3,31 +3,29 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 )
 
-type TopStack struct {
-	Cursor int
-	Stack  [3]int
-	Size   int
-}
-
-func (t *TopStack) Push(x int) {
-	t.Stack[t.Cursor] = x
-	t.Cursor = (t.Cursor + 1) % t.Size
-}
-
-func (t *TopStack) Current() int {
-	return t.Stack[t.Cursor]
-}
-
-func (t *TopStack) Sum() int {
+func sum(arr []int) int {
 	sum := 0
-	for _, i := range t.Stack {
+	for _, i := range arr {
 		sum += i
 	}
 	return sum
+}
+
+func lowest(arr []int) (int, int) {
+	lowestI := 0
+	lowestV := math.MaxInt
+	for i, v := range arr {
+		if v < lowestV {
+			lowestI = i
+			lowestV = v
+		}
+	}
+	return lowestI, lowestV
 }
 
 func main() {
@@ -38,8 +36,7 @@ func main() {
 	}
 	defer file.Close()
 
-	n := 3
-	top := TopStack{Cursor: 0, Stack: [3]int{0, 0, 0}, Size: n}
+	top := []int{0, 0, 0}
 
 	scanner := bufio.NewScanner(file)
 	total := 0
@@ -47,8 +44,9 @@ func main() {
 		x := scanner.Text()
 		switch x {
 		case "":
-			if total > top.Current() {
-				top.Push(total)
+			var lowest_i, lowest_v = lowest(top)
+			if total > lowest_v {
+				top[lowest_i] = total
 			}
 			total = 0
 		default:
@@ -60,11 +58,12 @@ func main() {
 		}
 	}
 
-	if total > top.Current() {
-		top.Push(total)
+	var lowestI, lowestV = lowest(top)
+	if total > lowestV {
+		top[lowestI] = lowestV
 	}
 
-	fmt.Printf("%d", top.Sum())
+	fmt.Printf("%d\n", sum(top))
 	if err := scanner.Err(); err != nil {
 		panic(err)
 	}
