@@ -7,13 +7,6 @@ import (
 	"strconv"
 )
 
-func max(x, y int) int {
-	if x < y {
-		return y
-	}
-	return x
-}
-
 func main() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
