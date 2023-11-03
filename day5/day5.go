@@ -123,6 +123,8 @@ func main() {
 	//	fmt.Println(v)
 	//}
 
+	crane := NewStack()
+
 	for scanner.Scan() {
 		line := strings.TrimSuffix(scanner.Text(), "\n")
 		if !strings.HasPrefix(line, "move") {
@@ -133,6 +135,14 @@ func main() {
 
 		for i := 1; i <= move.Qty; i++ {
 			v, err := stacks[move.From].Pop()
+			if err != nil {
+				panic(err)
+			}
+			crane.Push(v)
+		}
+
+		for i := 1; i <= move.Qty; i++ {
+			v, err := crane.Pop()
 			if err != nil {
 				panic(err)
 			}
