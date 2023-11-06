@@ -66,7 +66,7 @@ func main() {
 
 		window.Push(r)
 
-		if counter < 4 {
+		if counter < n {
 			continue
 		}
 
