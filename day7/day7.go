@@ -9,11 +9,10 @@ import (
 )
 
 type Node struct {
-	Name     string
-	Size     uint64
-	IsDir    bool
-	Children []*Node
-	Parent   *Node
+	Name  string
+	Size  uint64
+	IsDir bool
+	Links map[string]*Node
 }
 
 type Tree struct {
@@ -21,24 +20,42 @@ type Tree struct {
 	Current *Node
 }
 
+func NewFileNode(name string, size uint64) *Node {
+	return &Node{Name: name, Size: size, Links: make(map[string]*Node)}
+}
+
+func NewDirNode(name string) *Node {
+	return &Node{Name: name, IsDir: true, Links: make(map[string]*Node)}
+}
+
 func (parent *Node) append(children ...*Node) {
 	for _, child := range children {
-		parent.Children = append(parent.Children, child)
-		child.Parent = parent
+		parent.Links[child.Name] = child
+		child.Links[".."] = parent
 	}
 }
 
-func (tree *Tree) GoToRoot() {
-	tree.Current = tree.Root
-}
+func (tree *Tree) ChangeDirectory(name string) {
+	if name == "/" {
+		tree.Current = tree.Root
+		return
+	}
 
-func (tree *Tree) GoToParent() {
-	tree.Current = tree.Current.Parent
+	node, present := tree.Current.Links[name]
+	if present {
+		tree.Current = node
+	} else {
+		panic(fmt.Sprintf("Directory %s not found in %s", name, tree.Current.Name))
+	}
+
 }
 
 func WalkTree(node *Node, sum uint64) uint64 {
 	if node.IsDir {
-		for _, child := range node.Children {
+		for name, child := range node.Links {
+			if name == ".." {
+				continue
+			}
 			sum = WalkTree(child, sum)
 		}
 	} else {
@@ -48,16 +65,16 @@ func WalkTree(node *Node, sum uint64) uint64 {
 }
 
 func LoadTestTree(root *Node) *Node {
-	a := &Node{Name: "foobar.txt", Size: 10}
+	a := NewFileNode("foobar.txt", 10)
 
-	b := &Node{Name: "images", IsDir: true}
-	c := &Node{Name: "img.jpg", Size: 10}
-	d := &Node{Name: "img2.jpg", Size: 10}
+	b := NewDirNode("images")
+	c := NewFileNode("img.jpg", 10)
+	d := NewFileNode("img2.jpg", 10)
 	b.append(c, d)
 
-	e := &Node{Name: "css", IsDir: true}
-	f := &Node{Name: "style.css", Size: 11}
-	g := &Node{Name: "style2.css", Size: 11}
+	e := NewDirNode("css")
+	f := NewFileNode("style.css", 11)
+	g := NewFileNode("style2.css", 11)
 	e.append(f, g)
 
 	root.append(a, b, e)
@@ -73,8 +90,8 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	root := &Node{Name: "/", IsDir: true}
-	current := root
+	root := NewDirNode("/")
+	tree := &Tree{root, root}
 
 	for scanner.Scan() {
 		line := strings.TrimSuffix(scanner.Text(), "\n")
@@ -82,18 +99,7 @@ func main() {
 
 		if parts[0] == "$" {
 			if parts[1] == "cd" {
-				if parts[2] == "/" {
-					current = root
-				} else if parts[2] == ".." {
-					if current == root {
-						fmt.Println("Warning: cd .. at root")
-						continue
-					} else {
-						current = current.Parent
-					}
-				} else {
-					// TODO
-				}
+				tree.ChangeDirectory(parts[2])
 			} else if parts[1] == "ls" {
 				continue
 			} else {
@@ -102,17 +108,22 @@ func main() {
 			}
 
 		} else if parts[0] == "dir" {
-			dirName := strings.SplitN(line, " ", 2)
-			current.append(&Node{Name: dirName[1], IsDir: true})
+			tree.Current.append(NewDirNode(parts[1]))
 		} else {
-			splits := strings.SplitN(line, " ", 2)
-			name := splits[1]
-			size, _ := strconv.ParseUint(splits[0], 10, 64)
-			current.append(&Node{Name: name, Size: size})
+			size, err := strconv.ParseUint(parts[0], 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			tree.Current.append(NewFileNode(parts[1], size))
 		}
-
 	}
 
-	sum := WalkTree(root, 0)
-	fmt.Println(sum)
+	//sum := WalkTree(root, 0)
+
+	tree.ChangeDirectory("/")
+	fmt.Println(tree.Current.Links)
+	tree.ChangeDirectory("csmqbhjv")
+	fmt.Println(tree.Current.Links)
+
+	//fmt.Println(sum)
 }
