@@ -50,18 +50,25 @@ func (tree *Tree) ChangeDirectory(name string) {
 
 }
 
-func WalkTree(node *Node, sum uint64) uint64 {
+func WalkTree(node *Node, acc uint64) (uint64, uint64) {
+	var dirSum uint64 = 0
 	if node.IsDir {
 		for name, child := range node.Links {
 			if name == ".." {
 				continue
 			}
-			sum = WalkTree(child, sum)
+			ret, xacc := WalkTree(child, acc)
+			dirSum += ret
+			acc = xacc
+		}
+		if dirSum <= 100000 {
+			acc += dirSum
+			fmt.Printf("Dir: %s, Size: %d, Acc: %d\n", node.Name, dirSum, acc)
 		}
 	} else {
-		sum += node.Size
+		dirSum += node.Size
 	}
-	return sum
+	return dirSum, acc
 }
 
 func LoadTestTree(root *Node) *Node {
@@ -118,12 +125,13 @@ func main() {
 		}
 	}
 
-	//sum := WalkTree(root, 0)
+	sum, acc := WalkTree(root, 0)
 
-	tree.ChangeDirectory("/")
-	fmt.Println(tree.Current.Links)
-	tree.ChangeDirectory("csmqbhjv")
-	fmt.Println(tree.Current.Links)
+	//tree.ChangeDirectory("/")
+	//fmt.Println(tree.Current.Links)
+	//tree.ChangeDirectory("csmqbhjv")
+	//fmt.Println(tree.Current.Links)
 
-	//fmt.Println(sum)
+	fmt.Println(sum)
+	fmt.Println(acc)
 }
