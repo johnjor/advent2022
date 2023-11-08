@@ -63,7 +63,6 @@ func WalkTree(node *Node, acc uint64) (uint64, uint64) {
 		}
 		if dirSum <= 100000 {
 			acc += dirSum
-			fmt.Printf("Dir: %s, Size: %d, Acc: %d\n", node.Name, dirSum, acc)
 		}
 	} else {
 		dirSum += node.Size
@@ -125,13 +124,7 @@ func main() {
 		}
 	}
 
-	sum, acc := WalkTree(root, 0)
+	_, acc := WalkTree(root, 0)
 
-	//tree.ChangeDirectory("/")
-	//fmt.Println(tree.Current.Links)
-	//tree.ChangeDirectory("csmqbhjv")
-	//fmt.Println(tree.Current.Links)
-
-	fmt.Println(sum)
 	fmt.Println(acc)
 }
