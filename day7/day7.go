@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type Node struct {
@@ -68,6 +71,9 @@ func WalkTree(node *Node, acc uint64) (uint64, uint64) {
 	return dirSum, acc
 }
 
+var totalSpace uint64 = 70_000_000
+var Current = NewFileNode("foobar", totalSpace)
+
 func WalkTreePart2(node *Node, threshold uint64) {
 	if node.IsDir {
 		for name, child := range node.Links {
@@ -76,8 +82,8 @@ func WalkTreePart2(node *Node, threshold uint64) {
 			}
 			WalkTreePart2(child, threshold)
 		}
-		if node.Size > threshold {
-			fmt.Println(node.Size)
+		if node.Size >= threshold && node.Size < Current.Size {
+			Current = node
 		}
 	}
 }
@@ -146,55 +152,47 @@ func main() {
 	}
 	defer file.Close()
 
-	//scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(file)
 	root := NewDirNode("/")
-	//tree := &Tree{root, root}
+	tree := &Tree{root, root}
 
-	//for scanner.Scan() {
-	//	line := strings.TrimSuffix(scanner.Text(), "\n")
-	//	parts := strings.Split(line, " ")
-	//
-	//	if parts[0] == "$" {
-	//		if parts[1] == "cd" {
-	//			tree.ChangeDirectory(parts[2])
-	//		} else if parts[1] == "ls" {
-	//			continue
-	//		} else {
-	//			fmt.Printf("WTF? %s\n", line)
-	//			continue
-	//		}
-	//
-	//	} else if parts[0] == "dir" {
-	//		tree.Current.append(NewDirNode(parts[1]))
-	//	} else {
-	//		size, err := strconv.ParseUint(parts[0], 10, 64)
-	//		if err != nil {
-	//			panic(err)
-	//		}
-	//		tree.Current.append(NewFileNode(parts[1], size))
-	//	}
-	//}
+	for scanner.Scan() {
+		line := strings.TrimSuffix(scanner.Text(), "\n")
+		parts := strings.Split(line, " ")
+
+		if parts[0] == "$" {
+			if parts[1] == "cd" {
+				tree.ChangeDirectory(parts[2])
+			} else if parts[1] == "ls" {
+				continue
+			} else {
+				fmt.Printf("WTF? %s\n", line)
+				continue
+			}
+
+		} else if parts[0] == "dir" {
+			tree.Current.append(NewDirNode(parts[1]))
+		} else {
+			size, err := strconv.ParseUint(parts[0], 10, 64)
+			if err != nil {
+				panic(err)
+			}
+			tree.Current.append(NewFileNode(parts[1], size))
+		}
+	}
 
 	// Part 1
 	//_, acc := WalkTree(root, 0)
 	//fmt.Println(acc)
 
 	// Part 2
-	//var totalSize uint64 = 70_000_000
-	//var requiredFree uint64 = 30_000_000
-	//usedSpace, _ := WalkTree(root, 0)
-	//spaceNeeded := usedSpace - requiredFree
-	//
-	//fmt.Printf("Space needed: %d\n", spaceNeeded)
-	//WalkTreePart2(root, spaceNeeded)
-
-	LoadTestTree2(root)
-	var totalSpace uint64 = 70_000_000
+	//LoadTestTree2(root)
 	usedSpace, _ := WalkTree(root, 0)
 	freeSpace := totalSpace - usedSpace
 	threshold := 30_000_000 - freeSpace
 	fmt.Printf("Used Space: %d, Free Space: %d, Needed Space: %d\n", usedSpace, freeSpace, threshold)
 
 	WalkTreePart2(root, threshold)
+	fmt.Printf("To Be Deleted: %s, Size: %d\n", Current.Name, Current.Size)
 
 }
