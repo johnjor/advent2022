@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"strconv"
-	"strings"
 )
 
 type Node struct {
@@ -61,6 +58,7 @@ func WalkTree(node *Node, acc uint64) (uint64, uint64) {
 			dirSum += ret
 			acc = xacc
 		}
+		node.Size = dirSum
 		if dirSum <= 100000 {
 			acc += dirSum
 		}
@@ -68,6 +66,20 @@ func WalkTree(node *Node, acc uint64) (uint64, uint64) {
 		dirSum += node.Size
 	}
 	return dirSum, acc
+}
+
+func WalkTreePart2(node *Node, threshold uint64) {
+	if node.IsDir {
+		for name, child := range node.Links {
+			if name == ".." {
+				continue
+			}
+			WalkTreePart2(child, threshold)
+		}
+		if node.Size > threshold {
+			fmt.Println(node.Size)
+		}
+	}
 }
 
 func LoadTestTree(root *Node) *Node {
@@ -87,6 +99,45 @@ func LoadTestTree(root *Node) *Node {
 	return root
 }
 
+func LoadTestTree2(root *Node) *Node {
+	// - / (dir)
+	//  - a (dir)
+	//    - e (dir)
+	//      - i (file, size=584)
+	//    - f (file, size=29116)
+	//    - g (file, size=2557)
+	//    - h.lst (file, size=62596)
+	//  - b.txt (file, size=14848514)
+	//  - c.dat (file, size=8504156)
+	//  - d (dir)
+	//    - j (file, size=4060174)
+	//    - d.log (file, size=8033020)
+	//    - d.ext (file, size=5626152)
+	//    - k (file, size=7214296)
+	a := NewDirNode("a")
+	e := NewDirNode("e")
+	i := NewFileNode("i", 584)
+	e.append(i)
+
+	f := NewFileNode("f", 29116)
+	g := NewFileNode("g", 2557)
+	h := NewFileNode("h.lst", 62596)
+	a.append(e, f, g, h)
+
+	b := NewFileNode("b.txt", 14848514)
+	c := NewFileNode("c.dat", 8504156)
+	root.append(a, b, c)
+
+	d := NewDirNode("d")
+	j := NewFileNode("j", 4060174)
+	dlog := NewFileNode("d.log", 8033020)
+	dext := NewFileNode("d.ext", 5626152)
+	k := NewFileNode("k", 7214296)
+	d.append(j, dlog, dext, k)
+	root.append(d)
+	return root
+}
+
 func main() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
@@ -95,36 +146,55 @@ func main() {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
+	//scanner := bufio.NewScanner(file)
 	root := NewDirNode("/")
-	tree := &Tree{root, root}
+	//tree := &Tree{root, root}
 
-	for scanner.Scan() {
-		line := strings.TrimSuffix(scanner.Text(), "\n")
-		parts := strings.Split(line, " ")
+	//for scanner.Scan() {
+	//	line := strings.TrimSuffix(scanner.Text(), "\n")
+	//	parts := strings.Split(line, " ")
+	//
+	//	if parts[0] == "$" {
+	//		if parts[1] == "cd" {
+	//			tree.ChangeDirectory(parts[2])
+	//		} else if parts[1] == "ls" {
+	//			continue
+	//		} else {
+	//			fmt.Printf("WTF? %s\n", line)
+	//			continue
+	//		}
+	//
+	//	} else if parts[0] == "dir" {
+	//		tree.Current.append(NewDirNode(parts[1]))
+	//	} else {
+	//		size, err := strconv.ParseUint(parts[0], 10, 64)
+	//		if err != nil {
+	//			panic(err)
+	//		}
+	//		tree.Current.append(NewFileNode(parts[1], size))
+	//	}
+	//}
 
-		if parts[0] == "$" {
-			if parts[1] == "cd" {
-				tree.ChangeDirectory(parts[2])
-			} else if parts[1] == "ls" {
-				continue
-			} else {
-				fmt.Printf("WTF? %s\n", line)
-				continue
-			}
+	// Part 1
+	//_, acc := WalkTree(root, 0)
+	//fmt.Println(acc)
 
-		} else if parts[0] == "dir" {
-			tree.Current.append(NewDirNode(parts[1]))
-		} else {
-			size, err := strconv.ParseUint(parts[0], 10, 64)
-			if err != nil {
-				panic(err)
-			}
-			tree.Current.append(NewFileNode(parts[1], size))
-		}
-	}
+	// Part 2
+	//var totalSize uint64 = 70_000_000
+	//var requiredFree uint64 = 30_000_000
+	//usedSpace, _ := WalkTree(root, 0)
+	//spaceNeeded := usedSpace - requiredFree
+	//
+	//fmt.Printf("Space needed: %d\n", spaceNeeded)
+	//WalkTreePart2(root, spaceNeeded)
 
-	_, acc := WalkTree(root, 0)
+	LoadTestTree2(root)
+	var totalSpace uint64 = 70_000_000
+	usedSpace, _ := WalkTree(root, 0)
+	freeSpace := totalSpace - usedSpace
+	threshold := 30_000_000 - freeSpace
+	fmt.Printf("Used Space: %d, Free Space: %d, Needed Space: %d\n", usedSpace, freeSpace, threshold)
 
-	fmt.Println(acc)
+	WalkTreePart2(root, threshold)
+
 }
