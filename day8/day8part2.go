@@ -18,55 +18,88 @@ func ScenicScore(row int, col int, maxRow int, maxCol int) int {
 	point := Point2{row, col}
 	height := inputMap2[point]
 
-	colCursor := col - 1
-	leftScore := 1
-	for {
-		farPoint := Point2{row, colCursor}
-		farHeight, exists := inputMap2[farPoint]
-		if !exists || farHeight >= height {
-			break
+	// Left
+	leftScore := 0
+	if col == 0 {
+		leftScore = 0
+	} else {
+		colCursor := col - 1
+		for {
+			farPoint := Point2{row, colCursor}
+			farHeight, exists := inputMap2[farPoint]
+			if !exists {
+				break
+			}
+			leftScore += 1
+			//fmt.Printf("%d, %v\n", farHeight, exists)
+			if farHeight >= height {
+				break
+			}
+			colCursor -= 1
 		}
-		leftScore += 1
-		colCursor -= 1
 	}
 
-	colCursor = col + 1
-	rightScore := 1
-	for {
-		farPoint := Point2{row, colCursor}
-		farHeight, exists := inputMap2[farPoint]
-		if !exists || farHeight >= height {
-			break
+	// Right
+	rightScore := 0
+	if col == maxCol {
+		rightScore = 0
+	} else {
+		colCursor := col + 1
+		for {
+			farPoint := Point2{row, colCursor}
+			farHeight, exists := inputMap2[farPoint]
+			if !exists {
+				break
+			}
+			rightScore += 1
+			if farHeight >= height {
+				break
+			}
+			colCursor += 1
 		}
-		rightScore += 1
-		colCursor += 1
 	}
 
-	rowCursor := row - 1
-	upScore := 1
-	for {
-		farPoint := Point2{row, colCursor}
-		farHeight, exists := inputMap2[farPoint]
-		if !exists || farHeight >= height {
-			break
+	// Up
+	upScore := 0
+	if row == 0 {
+		upScore = 0
+	} else {
+		rowCursor := row - 1
+		for {
+			farPoint := Point2{rowCursor, col}
+			farHeight, exists := inputMap2[farPoint]
+			if !exists {
+				break
+			}
+			upScore += 1
+			if farHeight >= height {
+				break
+			}
+			rowCursor -= 1
 		}
-		upScore += 1
-		rowCursor -= 1
 	}
 
-	rowCursor = row + 1
-	downScore := 1
-	for {
-		farPoint := Point2{row, colCursor}
-		farHeight, exists := inputMap2[farPoint]
-		if !exists || farHeight >= height {
-			break
+	// Down
+	downScore := 0
+	if row == maxRow {
+		downScore = 0
+	} else {
+		rowCursor := row + 1
+		for {
+			farPoint := Point2{rowCursor, col}
+			farHeight, exists := inputMap2[farPoint]
+			if !exists {
+				break
+			}
+			downScore += 1
+			if farHeight >= height {
+				break
+			}
+			rowCursor += 1
 		}
-		downScore += 1
-		rowCursor += 1
 	}
 
-	//fmt.Printf("l: %d, r: %d, u: %d, d: %d\n", leftScore, rightScore, upScore, downScore)
+	//fmt.Printf("(%d, %d) l: %d, r: %d, u: %d, d: %d (%d)\n", row, col, leftScore, rightScore, upScore, downScore, height)
 	return leftScore * rightScore * upScore * downScore
 }
 
