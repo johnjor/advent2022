@@ -1,4 +1,4 @@
-package main
+package day9
 
 import (
 	"bufio"
@@ -95,7 +95,7 @@ func parseLine(line string) (string, int) {
 	return direction, distance
 }
 
-func main() {
+func Run() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

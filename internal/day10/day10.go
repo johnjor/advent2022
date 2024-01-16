@@ -1,4 +1,4 @@
-package main
+package day10
 
 import (
 	"bufio"
@@ -51,8 +51,7 @@ func (cpu *CPU) processLine(line string) {
 	}
 }
 
-func main() {
-	filename := os.Args[1]
+func Run(filename string) {
 	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)

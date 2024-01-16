@@ -1,4 +1,4 @@
-package main
+package day6
 
 import (
 	"bufio"
@@ -43,7 +43,7 @@ func (w *Window) AreAllUnique() bool {
 	return true
 }
 
-func main() {
+func Run() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

@@ -1,4 +1,4 @@
-package main
+package day3
 
 import (
 	"bufio"
@@ -94,7 +94,7 @@ func merge(cs ...<-chan int) <-chan int {
 	return out
 }
 
-func main() {
+func RunGoRoutines() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

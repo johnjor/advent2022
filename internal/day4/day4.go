@@ -1,4 +1,4 @@
-package main
+package day4
 
 import (
 	"bufio"
@@ -57,7 +57,7 @@ func processValues(line string) int {
 	return compareValuesPart2(a, b, x, y)
 }
 
-func main() {
+func Run() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

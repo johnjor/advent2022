@@ -1,4 +1,4 @@
-package main
+package day1
 
 import (
 	"bufio"
@@ -28,7 +28,7 @@ func lowest(arr []int) (int, int) {
 	return lowestI, lowestV
 }
 
-func main() {
+func Day1Part2() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

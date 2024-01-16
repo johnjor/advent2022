@@ -1,4 +1,4 @@
-package main
+package day3
 
 import (
 	"bufio"
@@ -46,7 +46,7 @@ func getCommonBadgeValue(bag1 string, bag2 string, bag3 string) int {
 	return -1
 }
 
-func main() {
+func RunPart2() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

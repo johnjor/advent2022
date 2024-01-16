@@ -1,4 +1,4 @@
-package main
+package day5
 
 import (
 	"bufio"
@@ -105,7 +105,7 @@ func ParseMove(line string) *Move {
 	return &Move{q, f, t}
 }
 
-func main() {
+func Run() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

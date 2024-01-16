@@ -1,4 +1,4 @@
-package main
+package day2
 
 import (
 	"bufio"
@@ -51,7 +51,7 @@ func makePart2Map() map[string]int {
 	return values
 }
 
-func main() {
+func Run() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

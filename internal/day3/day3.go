@@ -1,4 +1,4 @@
-package main
+package day3
 
 import (
 	"bufio"
@@ -44,7 +44,7 @@ func getIntersection(line string) int {
 	return -1
 }
 
-func main() {
+func Run() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

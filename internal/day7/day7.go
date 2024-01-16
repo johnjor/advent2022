@@ -1,4 +1,4 @@
-package main
+package day7
 
 import (
 	"bufio"
@@ -144,7 +144,7 @@ func LoadTestTree2(root *Node) *Node {
 	return root
 }
 
-func main() {
+func Run() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

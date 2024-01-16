@@ -1,4 +1,4 @@
-package main
+package day1
 
 import (
 	"bufio"
@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func main() {
+func Day1() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

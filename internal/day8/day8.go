@@ -1,4 +1,4 @@
-package main
+package day8
 
 import (
 	"bufio"
@@ -75,7 +75,7 @@ func runUp(maxRow int, maxCol int) {
 	}
 }
 
-func main() {
+func Run() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {

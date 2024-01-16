@@ -1,4 +1,4 @@
-package main
+package day8
 
 import (
 	"bufio"
@@ -103,7 +103,7 @@ func ScenicScore(row int, col int, maxRow int, maxCol int) int {
 	return leftScore * rightScore * upScore * downScore
 }
 
-func main() {
+func RunPart2() {
 	filename := os.Args[1]
 	file, err := os.Open(filename)
 	if err != nil {
