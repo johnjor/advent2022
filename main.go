@@ -1,7 +1,7 @@
 package main
 
-import "advent2022/internal/day10"
+import "advent2022/internal/day11"
 
 func main() {
-	day10.Run("input/day10/input.txt")
+	day11.Run("input/day11/sample.txt")
 }
