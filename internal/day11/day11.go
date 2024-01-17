@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -18,7 +19,34 @@ type Monkey struct {
 	IfTrueId  int
 	IfFalseId int
 	IfTrue    *Monkey
-	ifFalse   *Monkey
+	IfFalse   *Monkey
+	Count     int
+}
+
+func (monkey *Monkey) NextItem() int {
+	item := monkey.Items[0]
+	monkey.Items = monkey.Items[1:]
+	return item
+}
+
+func (monkey *Monkey) HandleNextItem() {
+	item := monkey.NextItem()
+	monkey.Count++
+	item = monkey.Operation(item) // Apply op
+	item = item / 3               // Relief
+	if item%monkey.Test == 0 {    // Test
+		// Throw to IfTrue
+		monkey.IfTrue.Items = append(monkey.IfTrue.Items, item)
+	} else {
+		// Throw to IfFalse
+		monkey.IfFalse.Items = append(monkey.IfFalse.Items, item)
+	}
+}
+
+func (monkey *Monkey) Turn() {
+	for len(monkey.Items) > 0 {
+		monkey.HandleNextItem()
+	}
 }
 
 func MakeOp(str string) Op {
@@ -97,12 +125,42 @@ func Run(filename string) {
 	monkeyData := strings.Split(contents, "\n\n")
 	monkeys := make([]*Monkey, 0)
 
+	// Parse data into structs
 	for _, m := range monkeyData {
 		monkeys = append(monkeys, MakeMonkey(m))
 	}
 
-	for _, m := range monkeys {
-		fmt.Printf("%+v\n", m)
+	// Map int ids to references
+	for i, _ := range monkeys {
+		ifTrueId := monkeys[i].IfTrueId
+		ifFalseId := monkeys[i].IfFalseId
+		monkeys[i].IfTrue = monkeys[ifTrueId]
+		monkeys[i].IfFalse = monkeys[ifFalseId]
 	}
 
+	//fmt.Println("Initial")
+	//for _, m := range monkeys {
+	//	fmt.Printf("%+v\n", m)
+	//	//fmt.Printf("%d true:%d, false:%d\n", m.Id, m.IfTrue.Id, m.IfFalse.Id)
+	//}
+
+	for i := 1; i <= 20; i++ {
+		for _, m := range monkeys {
+			m.Turn()
+		}
+		//fmt.Printf("After %d round\n", i)
+		//for _, m := range monkeys {
+		//	fmt.Printf("%+v\n", m)
+		//}
+	}
+
+	//for _, m := range monkeys {
+	//	fmt.Printf("Id=%d, Count=%d\n", m.Id, m.Count)
+	//}
+
+	sort.Slice(monkeys[:], func(i, j int) bool {
+		return monkeys[i].Count > monkeys[j].Count
+	})
+
+	fmt.Printf("%d", monkeys[0].Count*monkeys[1].Count)
 }
